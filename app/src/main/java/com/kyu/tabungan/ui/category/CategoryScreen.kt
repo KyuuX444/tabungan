@@ -41,9 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kyu.tabungan.components.NeoButton
 import com.kyu.tabungan.components.NeoCard
+import com.kyu.tabungan.components.NeoCategoryTabToggle
 import com.kyu.tabungan.components.NeoDialog
 import com.kyu.tabungan.components.NeoIconButton
 import com.kyu.tabungan.components.NeoTextField
+import com.kyu.tabungan.components.NeoTransactionTypeToggle
 import com.kyu.tabungan.components.icons.NeoIcons
 import com.kyu.tabungan.data.entity.CategoryEntity
 import com.kyu.tabungan.data.entity.TransactionType
@@ -53,7 +55,6 @@ import com.kyu.tabungan.theme.BrightBlue
 import com.kyu.tabungan.theme.HardShadowColor
 import com.kyu.tabungan.theme.LightBlue
 import com.kyu.tabungan.theme.StatusDanger
-import com.kyu.tabungan.theme.StatusSuccess
 import com.kyu.tabungan.theme.Surface
 import com.kyu.tabungan.theme.TextMain
 import com.kyu.tabungan.theme.TextMuted
@@ -124,62 +125,10 @@ fun CategoryScreen(
                         color = TextMain,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        val expenseShape = RoundedCornerShape(8.dp)
-                        Box(modifier = Modifier.weight(1f).padding(end = 2.dp, bottom = 2.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .offset(x = 2.dp, y = 2.dp)
-                                    .background(HardShadowColor, shape = expenseShape)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .clip(expenseShape)
-                                    .background(if (catType == TransactionType.EXPENSE) StatusDanger else Surface)
-                                    .border(width = 1.5.dp, color = BorderColor, shape = expenseShape)
-                                    .clickable { catType = TransactionType.EXPENSE }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Pengeluaran",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (catType == TransactionType.EXPENSE) Surface else TextMain
-                                )
-                            }
-                        }
-
-                        val incomeShape = RoundedCornerShape(8.dp)
-                        Box(modifier = Modifier.weight(1f).padding(end = 2.dp, bottom = 2.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .offset(x = 2.dp, y = 2.dp)
-                                    .background(HardShadowColor, shape = incomeShape)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .clip(incomeShape)
-                                    .background(if (catType == TransactionType.INCOME) StatusSuccess else Surface)
-                                    .border(width = 1.5.dp, color = BorderColor, shape = incomeShape)
-                                    .clickable { catType = TransactionType.INCOME }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Pemasukan",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (catType == TransactionType.INCOME) Surface else TextMain
-                                )
-                            }
-                        }
-                    }
+                    NeoTransactionTypeToggle(
+                        selectedType = catType,
+                        onTypeSelected = { catType = it }
+                    )
                 }
 
                 Column {
@@ -306,62 +255,10 @@ fun CategoryScreen(
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    val expShape = RoundedCornerShape(10.dp)
-                    Box(modifier = Modifier.weight(1f).padding(end = 2.dp, bottom = 2.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .offset(x = 2.dp, y = 2.dp)
-                                .background(HardShadowColor, shape = expShape)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .clip(expShape)
-                                .background(if (selectedTab == TransactionType.EXPENSE) BrightBlue else Surface)
-                                .border(width = 2.dp, color = BorderColor, shape = expShape)
-                                .clickable { selectedTab = TransactionType.EXPENSE }
-                                .padding(vertical = 10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Pengeluaran",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (selectedTab == TransactionType.EXPENSE) Surface else TextMain
-                            )
-                        }
-                    }
-
-                    val incShape = RoundedCornerShape(10.dp)
-                    Box(modifier = Modifier.weight(1f).padding(end = 2.dp, bottom = 2.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .offset(x = 2.dp, y = 2.dp)
-                                .background(HardShadowColor, shape = incShape)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .clip(incShape)
-                                .background(if (selectedTab == TransactionType.INCOME) BrightBlue else Surface)
-                                .border(width = 2.dp, color = BorderColor, shape = incShape)
-                                .clickable { selectedTab = TransactionType.INCOME }
-                                .padding(vertical = 10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Pemasukan",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (selectedTab == TransactionType.INCOME) Surface else TextMain
-                            )
-                        }
-                    }
-                }
+                NeoCategoryTabToggle(
+                    selectedType = selectedTab,
+                    onTypeSelected = { selectedTab = it }
+                )
             }
 
             items(filteredList, key = { it.id }) { cat ->

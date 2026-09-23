@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.kyu.tabungan.data.repository.TabunganRepository
+import com.kyu.tabungan.ui.about.AboutDevScreen
 import com.kyu.tabungan.ui.budget.BudgetScreen
 import com.kyu.tabungan.ui.budget.BudgetViewModel
 import com.kyu.tabungan.ui.category.CategoryScreen
@@ -91,7 +92,8 @@ fun TabunganNavHost(
                 onNavigateToBudgets = { navController.navigate(Screen.Budgets.route) },
                 onNavigateToCategories = { navController.navigate(Screen.Categories.route) },
                 onNavigateToSearch = { navController.navigate(Screen.Search.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToAboutDev = { navController.navigate(Screen.AboutDev.route) }
             )
         }
 
@@ -125,7 +127,14 @@ fun TabunganNavHost(
             SettingsScreen(
                 viewModel = vm,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToCategories = { navController.navigate(Screen.Categories.route) }
+                onNavigateToCategories = { navController.navigate(Screen.Categories.route) },
+                onNavigateToAboutDev = { navController.navigate(Screen.AboutDev.route) }
+            )
+        }
+
+        composable(Screen.AboutDev.route) {
+            AboutDevScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

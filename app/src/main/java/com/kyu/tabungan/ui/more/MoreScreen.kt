@@ -42,6 +42,7 @@ fun MoreScreen(
     onNavigateToCategories: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToAboutDev: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -105,6 +106,15 @@ fun MoreScreen(
                 subtitle = "Ekspor data, impor data cadangan, dan info aplikasi",
                 icon = NeoIcons.Settings,
                 onClick = onNavigateToSettings
+            )
+        }
+
+        item {
+            MoreMenuCard(
+                title = "Tentang Pengembang",
+                subtitle = "Profil pengembang Kyuu dan Saluran WhatsApp",
+                icon = NeoIcons.Info,
+                onClick = onNavigateToAboutDev
             )
         }
     }

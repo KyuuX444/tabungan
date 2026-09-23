@@ -1,5 +1,10 @@
 package com.kyu.tabungan.ui.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -332,21 +337,34 @@ fun HomeScreen(
             }
         }
 
-        if (uiState.recentTransactions.isEmpty()) {
-            item {
-                NeoEmptyState(
-                    title = "Belum Ada Transaksi",
-                    message = "Mulai catat pemasukan dan pengeluaran\nuntuk mengetahui kondisi keuanganmu.",
-                    actionText = "Tambah Transaksi",
-                    onActionClick = onNavigateToAddTransaction
-                )
-            }
-        } else {
-            items(uiState.recentTransactions, key = { it.id }) { transaction ->
-                NeoTransactionItem(
-                    item = transaction,
-                    onClick = { onNavigateToTransactionDetail(transaction.id) }
-                )
+        item {
+            AnimatedContent(
+                targetState = uiState.recentTransactions.isEmpty(),
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(200))
+                },
+                label = "recentTxAnim"
+            ) { isEmpty ->
+                if (isEmpty) {
+                    NeoEmptyState(
+                        title = "Belum Ada Transaksi",
+                        message = "Mulai catat pemasukan dan pengeluaran\nuntuk mengetahui kondisi keuanganmu.",
+                        actionText = "Tambah Transaksi",
+                        onActionClick = onNavigateToAddTransaction
+                    )
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        uiState.recentTransactions.forEach { transaction ->
+                            NeoTransactionItem(
+                                item = transaction,
+                                onClick = { onNavigateToTransactionDetail(transaction.id) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

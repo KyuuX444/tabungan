@@ -1,6 +1,12 @@
 package com.kyu.tabungan.ui.transaction
 
 import android.app.DatePickerDialog
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,25 +36,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kyu.tabungan.components.NeoAmountField
 import com.kyu.tabungan.components.NeoButton
-import com.kyu.tabungan.components.NeoCard
 import com.kyu.tabungan.components.NeoIconButton
 import com.kyu.tabungan.components.NeoTextField
+import com.kyu.tabungan.components.NeoTransactionTypeToggle
 import com.kyu.tabungan.components.icons.NeoIcons
 import com.kyu.tabungan.data.entity.TransactionType
 import com.kyu.tabungan.theme.Background
 import com.kyu.tabungan.theme.BorderColor
 import com.kyu.tabungan.theme.BrightBlue
 import com.kyu.tabungan.theme.HardShadowColor
-import com.kyu.tabungan.theme.LightBlue
 import com.kyu.tabungan.theme.StatusDanger
-import com.kyu.tabungan.theme.StatusSuccess
 import com.kyu.tabungan.theme.Surface
 import com.kyu.tabungan.theme.TextMain
 import com.kyu.tabungan.theme.TextMuted
@@ -90,8 +92,6 @@ fun AddEditTransactionScreen(
         cal.get(Calendar.DAY_OF_MONTH)
     )
 
-    val currentTypeCategories = uiState.categories.filter { it.type == uiState.type }
-
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -121,74 +121,10 @@ fun AddEditTransactionScreen(
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val isExpense = uiState.type == TransactionType.EXPENSE
-                val expenseShape = RoundedCornerShape(12.dp)
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 3.dp, bottom = 3.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 3.dp, y = 3.dp)
-                            .background(HardShadowColor, shape = expenseShape)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .clip(expenseShape)
-                            .background(if (isExpense) StatusDanger else Surface)
-                            .border(width = 2.dp, color = BorderColor, shape = expenseShape)
-                            .clickable { viewModel.setType(TransactionType.EXPENSE) }
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Pengeluaran",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isExpense) Surface else TextMain
-                        )
-                    }
-                }
-
-                val isIncome = uiState.type == TransactionType.INCOME
-                val incomeShape = RoundedCornerShape(12.dp)
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 3.dp, bottom = 3.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 3.dp, y = 3.dp)
-                            .background(HardShadowColor, shape = incomeShape)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .clip(incomeShape)
-                            .background(if (isIncome) StatusSuccess else Surface)
-                            .border(width = 2.dp, color = BorderColor, shape = incomeShape)
-                            .clickable { viewModel.setType(TransactionType.INCOME) }
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Pemasukan",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isIncome) Surface else TextMain
-                        )
-                    }
-                }
-            }
+            NeoTransactionTypeToggle(
+                selectedType = uiState.type,
+                onTypeSelected = { viewModel.setType(it) }
+            )
         }
 
         item {
@@ -229,45 +165,56 @@ fun AddEditTransactionScreen(
                     )
                 }
 
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(currentTypeCategories, key = { it.id }) { cat ->
-                        val isSelected = uiState.selectedCategoryId == cat.id
-                        val catIcon = NeoIcons.getCategoryIcon(cat.icon.ifEmpty { cat.name })
-                        val catShape = RoundedCornerShape(10.dp)
+                AnimatedContent(
+                    targetState = uiState.type,
+                    transitionSpec = {
+                        (fadeIn(animationSpec = tween(220)) + slideInVertically(animationSpec = tween(220)) { it / 3 })
+                            .togetherWith(fadeOut(animationSpec = tween(150)))
+                    },
+                    label = "categoryAnim"
+                ) { targetType ->
+                    val currentTypeCategories = uiState.categories.filter { it.type == targetType }
 
-                        Box(
-                            modifier = Modifier.padding(end = 3.dp, bottom = 3.dp)
-                        ) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(currentTypeCategories, key = { it.id }) { cat ->
+                            val isSelected = uiState.selectedCategoryId == cat.id
+                            val catIcon = NeoIcons.getCategoryIcon(cat.icon.ifEmpty { cat.name })
+                            val catShape = RoundedCornerShape(10.dp)
+
                             Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .offset(x = 3.dp, y = 3.dp)
-                                    .background(HardShadowColor, shape = catShape)
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .clip(catShape)
-                                    .background(if (isSelected) BrightBlue else Surface)
-                                    .border(width = 2.dp, color = BorderColor, shape = catShape)
-                                    .clickable { viewModel.setCategory(cat.id) }
-                                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier.padding(end = 3.dp, bottom = 3.dp)
                             ) {
-                                Icon(
-                                    imageVector = catIcon,
-                                    contentDescription = cat.name,
-                                    tint = if (isSelected) Surface else TextMain,
-                                    modifier = Modifier.size(18.dp)
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .offset(x = 3.dp, y = 3.dp)
+                                        .background(HardShadowColor, shape = catShape)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = cat.name,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) Surface else TextMain
-                                )
+                                Row(
+                                    modifier = Modifier
+                                        .clip(catShape)
+                                        .background(if (isSelected) BrightBlue else Surface)
+                                        .border(width = 2.dp, color = BorderColor, shape = catShape)
+                                        .clickable { viewModel.setCategory(cat.id) }
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = catIcon,
+                                        contentDescription = cat.name,
+                                        tint = if (isSelected) Surface else TextMain,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = cat.name,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) Surface else TextMain
+                                    )
+                                }
                             }
                         }
                     }

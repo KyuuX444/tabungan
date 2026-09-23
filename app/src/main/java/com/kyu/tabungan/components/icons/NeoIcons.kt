@@ -724,6 +724,28 @@ object NeoIcons {
         }
     }
 
+    val Info: ImageVector by lazy {
+        vector("Info") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 16f)
+                verticalLineTo(12f)
+                moveTo(12f, 8f)
+                horizontalLineTo(12.01f)
+                moveTo(22f, 12f)
+                curveTo(22f, 17.52f, 17.52f, 22f, 12f, 22f)
+                curveTo(6.48f, 22f, 2f, 17.52f, 2f, 12f)
+                curveTo(2f, 6.48f, 6.48f, 2f, 12f, 2f)
+                curveTo(17.52f, 2f, 22f, 6.48f, 22f, 12f)
+                close()
+            }
+        }
+    }
+
     val Budget: ImageVector by lazy {
         vector("Budget") {
             path(

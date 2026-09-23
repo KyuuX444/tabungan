@@ -64,6 +64,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToCategories: () -> Unit,
+    onNavigateToAboutDev: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -86,7 +87,6 @@ fun SettingsScreen(
                 pendingExportJson = null
                 snackbarHostState.currentSnackbarData?.dismiss()
             } catch (e: Exception) {
-                // handle error
             }
         }
     }
@@ -103,7 +103,6 @@ fun SettingsScreen(
                     }
                 }
             } catch (e: Exception) {
-                // handle error
             }
         }
     }
@@ -306,6 +305,16 @@ fun SettingsScreen(
             }
 
             item {
+                SettingActionCard(
+                    title = "Tentang Pengembang",
+                    description = "Profil pengembang Kyuu dan Saluran WhatsApp",
+                    icon = NeoIcons.Info,
+                    iconColor = BrightBlue,
+                    onClick = onNavigateToAboutDev
+                )
+            }
+
+            item {
                 NeoCard(
                     modifier = Modifier.fillMaxWidth(),
                     shadowOffset = 4.dp,
@@ -328,7 +337,7 @@ fun SettingsScreen(
                                 color = TextMain
                             )
                             Text(
-                                text = "1.0.0",
+                                text = "1.0.1",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextMuted
