@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Tabungan</string>
+    <string name="shortcut_add_expense_short">Pengeluaran</string>
+    <string name="shortcut_add_expense_long">Tambah Pengeluaran</string>
+    <string name="shortcut_add_income_short">Pemasukan</string>
+    <string name="shortcut_add_income_long">Tambah Pemasukan</string>
+    <string name="shortcut_statistics_short">Statistik</string>
+    <string name="shortcut_statistics_long">Lihat Statistik</string>
+    <string name="shortcut_wallet_short">Dompet</string>
+    <string name="shortcut_wallet_long">Dompet</string>
+    <string name="widget_small_name">Tabungan 2x2</string>
+    <string name="widget_small_description">Menampilkan saldo total dan pintasan transaksi cepat</string>
+    <string name="widget_large_name">Tabungan 4x2</string>
+    <string name="widget_large_description">Menampilkan saldo, pemasukan, pengeluaran, dan aksi transaksi</string>
+</resources>

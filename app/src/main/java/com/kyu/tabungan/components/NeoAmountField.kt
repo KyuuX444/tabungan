@@ -1,0 +1,133 @@
+package com.kyu.tabungan.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kyu.tabungan.theme.BorderColor
+import com.kyu.tabungan.theme.HardShadowColor
+import com.kyu.tabungan.theme.StatusDanger
+import com.kyu.tabungan.theme.Surface
+import com.kyu.tabungan.theme.TextMain
+import com.kyu.tabungan.theme.TextMuted
+import com.kyu.tabungan.util.CurrencyFormatter
+
+@Composable
+fun NeoAmountField(
+    amount: Long,
+    onAmountChange: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+    isExpense: Boolean = true,
+    errorMessage: String? = null,
+    shadowOffset: Dp = 4.dp
+) {
+    val shape = RoundedCornerShape(14.dp)
+    val hasError = !errorMessage.isNullOrBlank()
+
+    val formattedString = if (amount == 0L) "" else CurrencyFormatter.formatRupiah(amount, withPrefix = false)
+
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = shadowOffset, bottom = shadowOffset)
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = shadowOffset, y = shadowOffset)
+                    .background(
+                        color = if (hasError) StatusDanger else HardShadowColor,
+                        shape = shape
+                    )
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape)
+                    .background(Surface)
+                    .border(
+                        width = 2.5.dp,
+                        color = if (hasError) StatusDanger else BorderColor,
+                        shape = shape
+                    )
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Rp ",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Black,
+                        color = TextMuted
+                    )
+
+                    BasicTextField(
+                        value = formattedString,
+                        onValueChange = { input ->
+                            val parsed = CurrencyFormatter.parseAmount(input)
+                            onAmountChange(parsed)
+                        },
+                        textStyle = TextStyle(
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Black,
+                            color = TextMain,
+                            textAlign = TextAlign.Start
+                        ),
+                        cursorBrush = SolidColor(BorderColor),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        decorationBox = { innerTextField ->
+                            if (formattedString.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = TextMuted
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                }
+            }
+        }
+
+        if (hasError) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = errorMessage.orEmpty(),
+                color = StatusDanger,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+    }
+}

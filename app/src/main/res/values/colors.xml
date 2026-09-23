@@ -1,0 +1,14 @@
+<resources>
+    <color name="bright_blue">#1687FF</color>
+    <color name="deep_blue">#0756C9</color>
+    <color name="sky_blue">#6DB7FF</color>
+    <color name="light_blue">#E8F4FF</color>
+    <color name="background_light">#F5F9FF</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="text_main">#111111</color>
+    <color name="text_muted">#606773</color>
+    <color name="border_black">#111111</color>
+    <color name="status_success">#19B96B</color>
+    <color name="status_danger">#FF4D4D</color>
+    <color name="status_warning">#FFD84D</color>
+</resources>

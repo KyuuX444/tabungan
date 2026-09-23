@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcut_add_expense"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_expense"
+        android:shortcutShortLabel="@string/shortcut_add_expense_short"
+        android:shortcutLongLabel="@string/shortcut_add_expense_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.kyu.tabungan"
+            android:targetClass="com.kyu.tabungan.MainActivity"
+            android:data="tabungan://add-expense" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_add_income"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_income"
+        android:shortcutShortLabel="@string/shortcut_add_income_short"
+        android:shortcutLongLabel="@string/shortcut_add_income_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.kyu.tabungan"
+            android:targetClass="com.kyu.tabungan.MainActivity"
+            android:data="tabungan://add-income" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_statistics"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_statistics"
+        android:shortcutShortLabel="@string/shortcut_statistics_short"
+        android:shortcutLongLabel="@string/shortcut_statistics_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.kyu.tabungan"
+            android:targetClass="com.kyu.tabungan.MainActivity"
+            android:data="tabungan://statistics" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_wallet"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_wallet"
+        android:shortcutShortLabel="@string/shortcut_wallet_short"
+        android:shortcutLongLabel="@string/shortcut_wallet_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.kyu.tabungan"
+            android:targetClass="com.kyu.tabungan.MainActivity"
+            android:data="tabungan://wallet" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>
