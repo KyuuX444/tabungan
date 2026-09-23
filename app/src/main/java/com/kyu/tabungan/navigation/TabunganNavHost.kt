@@ -1,5 +1,9 @@
 package com.kyu.tabungan.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -12,12 +16,15 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.kyu.tabungan.data.entity.TransactionType
 import com.kyu.tabungan.data.repository.TabunganRepository
 import com.kyu.tabungan.ui.about.AboutDevScreen
 import com.kyu.tabungan.ui.budget.BudgetScreen
 import com.kyu.tabungan.ui.budget.BudgetViewModel
 import com.kyu.tabungan.ui.category.CategoryScreen
 import com.kyu.tabungan.ui.category.CategoryViewModel
+import com.kyu.tabungan.ui.goal.SavingsGoalScreen
+import com.kyu.tabungan.ui.goal.SavingsGoalViewModel
 import com.kyu.tabungan.ui.home.HomeScreen
 import com.kyu.tabungan.ui.home.HomeViewModel
 import com.kyu.tabungan.ui.more.MoreScreen
@@ -47,6 +54,7 @@ class TabunganViewModelFactory(
             modelClass.isAssignableFrom(CategoryViewModel::class.java) -> CategoryViewModel(repository) as T
             modelClass.isAssignableFrom(SearchTransactionViewModel::class.java) -> SearchTransactionViewModel(repository) as T
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(repository) as T
+            modelClass.isAssignableFrom(SavingsGoalViewModel::class.java) -> SavingsGoalViewModel(repository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
@@ -64,7 +72,19 @@ fun TabunganNavHost(
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
-        modifier = modifier.padding(paddingValues)
+        modifier = modifier.padding(paddingValues),
+        enterTransition = {
+            fadeIn(animationSpec = tween(220)) + slideInHorizontally(animationSpec = tween(220)) { it / 6 }
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(180))
+        },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(220)) + slideInHorizontally(animationSpec = tween(220)) { -it / 6 }
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(180))
+        }
     ) {
         composable(Screen.Home.route) {
             val vm: HomeViewModel = viewModel(factory = factory)
@@ -89,11 +109,20 @@ fun TabunganNavHost(
 
         composable(Screen.More.route) {
             MoreScreen(
+                onNavigateToGoals = { navController.navigate(Screen.SavingsGoals.route) },
                 onNavigateToBudgets = { navController.navigate(Screen.Budgets.route) },
                 onNavigateToCategories = { navController.navigate(Screen.Categories.route) },
                 onNavigateToSearch = { navController.navigate(Screen.Search.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToAboutDev = { navController.navigate(Screen.AboutDev.route) }
+            )
+        }
+
+        composable(Screen.SavingsGoals.route) {
+            val vm: SavingsGoalViewModel = viewModel(factory = factory)
+            SavingsGoalScreen(
+                viewModel = vm,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -158,7 +187,19 @@ fun TabunganNavHost(
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return AddEditTransactionViewModel(repository, savedStateHandle) as T
+                        val initialType = savedStateHandle.get<String>("type")?.let {
+                            try {
+                                TransactionType.valueOf(it)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+                        val initialId = savedStateHandle.get<String>("transactionId")?.toLongOrNull()
+                        return AddEditTransactionViewModel(
+                            repository = repository,
+                            initialTransactionId = initialId,
+                            initialType = initialType
+                        ) as T
                     }
                 }
             )
@@ -169,26 +210,26 @@ fun TabunganNavHost(
         }
 
         composable(
-            route = "transaction_detail/{transactionId}",
+            route = Screen.TransactionDetail.route,
             arguments = listOf(
-                navArgument("transactionId") {
-                    type = NavType.LongType
-                }
+                navArgument("transactionId") { type = NavType.LongType }
             )
         ) { backStackEntry ->
-            val savedStateHandle = backStackEntry.savedStateHandle
+            val transactionId = backStackEntry.arguments?.getLong("transactionId") ?: 0L
             val vm = viewModel<TransactionDetailViewModel>(
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return TransactionDetailViewModel(repository, savedStateHandle) as T
+                        return TransactionDetailViewModel(repository, transactionId) as T
                     }
                 }
             )
             TransactionDetailScreen(
                 viewModel = vm,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToEdit = { id -> navController.navigate(Screen.AddTransaction.createRoute(id)) }
+                onNavigateToEdit = { id ->
+                    navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
+                }
             )
         }
     }

@@ -71,22 +71,37 @@ fun NeoAmountField(
                     .clip(shape)
                     .background(Surface)
                     .border(
-                        width = 2.5.dp,
+                        width = 2.dp,
                         color = if (hasError) StatusDanger else BorderColor,
                         shape = shape
                     )
-                    .padding(horizontal = 16.dp, vertical = 18.dp),
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                contentAlignment = Alignment.CenterStart
             ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Rp ",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black,
-                        color = TextMuted
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isExpense) Color(0xFFFFECEC) else Color(0xFFE8F9EE))
+                            .border(
+                                width = 1.5.dp,
+                                color = BorderColor,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "Rp",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Black,
+                            color = if (isExpense) Color(0xFFFF4D4D) else Color(0xFF19B96B)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
 
                     BasicTextField(
                         value = formattedString,
@@ -94,8 +109,9 @@ fun NeoAmountField(
                             val parsed = CurrencyFormatter.parseAmount(input)
                             onAmountChange(parsed)
                         },
+                        modifier = Modifier.weight(1f),
                         textStyle = TextStyle(
-                            fontSize = 32.sp,
+                            fontSize = 26.sp,
                             fontWeight = FontWeight.Black,
                             color = TextMain,
                             textAlign = TextAlign.Start
@@ -104,14 +120,6 @@ fun NeoAmountField(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         decorationBox = { innerTextField ->
-                            if (formattedString.isEmpty()) {
-                                Text(
-                                    text = "0",
-                                    fontSize = 32.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = TextMuted
-                                )
-                            }
                             innerTextField()
                         }
                     )

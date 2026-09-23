@@ -113,8 +113,7 @@ fun CategoryScreen(
                 NeoTextField(
                     value = catName,
                     onValueChange = { catName = it },
-                    label = "Nama Kategori",
-                    placeholder = "Contoh: Kopi, Asuransi, Hobi"
+                    label = "Nama Kategori"
                 )
 
                 Column {

@@ -53,6 +53,13 @@ interface TabunganRepository {
     suspend fun updateBudget(budget: BudgetEntity)
     suspend fun deleteBudget(id: Long)
 
+    fun getAllSavingsGoals(): Flow<List<com.kyu.tabungan.data.entity.SavingsGoalEntity>>
+    fun getSavingsGoalById(id: Long): Flow<com.kyu.tabungan.data.entity.SavingsGoalEntity?>
+    suspend fun insertSavingsGoal(goal: com.kyu.tabungan.data.entity.SavingsGoalEntity): Long
+    suspend fun updateSavingsGoal(goal: com.kyu.tabungan.data.entity.SavingsGoalEntity)
+    suspend fun deleteSavingsGoal(id: Long)
+    suspend fun addSavedAmountToGoal(goalId: Long, amountToAdd: Long)
+
     suspend fun loadSampleData()
     suspend fun clearAllData()
     suspend fun exportBackup(): BackupData

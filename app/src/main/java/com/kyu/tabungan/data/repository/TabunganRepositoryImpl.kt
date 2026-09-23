@@ -30,6 +30,7 @@ class TabunganRepositoryImpl(
     private val categoryDao = database.categoryDao()
     private val transactionDao = database.transactionDao()
     private val budgetDao = database.budgetDao()
+    private val savingsGoalDao = database.savingsGoalDao()
 
     override fun getWalletsWithBalance(): Flow<List<WalletWithBalance>> {
         return walletDao.getWalletsWithBalance().map { list ->
@@ -241,8 +242,36 @@ class TabunganRepositoryImpl(
         budgetDao.deleteById(id)
     }
 
+    override fun getAllSavingsGoals(): Flow<List<com.kyu.tabungan.data.entity.SavingsGoalEntity>> {
+        return savingsGoalDao.getAllGoals()
+    }
+
+    override fun getSavingsGoalById(id: Long): Flow<com.kyu.tabungan.data.entity.SavingsGoalEntity?> {
+        return savingsGoalDao.getGoalById(id)
+    }
+
+    override suspend fun insertSavingsGoal(goal: com.kyu.tabungan.data.entity.SavingsGoalEntity): Long {
+        return savingsGoalDao.insert(goal)
+    }
+
+    override suspend fun updateSavingsGoal(goal: com.kyu.tabungan.data.entity.SavingsGoalEntity) {
+        savingsGoalDao.update(goal)
+    }
+
+    override suspend fun deleteSavingsGoal(id: Long) {
+        savingsGoalDao.deleteById(id)
+    }
+
+    override suspend fun addSavedAmountToGoal(goalId: Long, amountToAdd: Long) {
+        val currentGoal = savingsGoalDao.getGoalByIdSync(goalId) ?: return
+        val newAmount = (currentGoal.savedAmount + amountToAdd).coerceAtLeast(0L)
+        val isAchieved = newAmount >= currentGoal.targetAmount
+        savingsGoalDao.updateSavedAmount(goalId, newAmount, isAchieved)
+    }
+
     override suspend fun loadSampleData() {
         database.withTransaction {
+            savingsGoalDao.deleteAll()
             budgetDao.deleteAll()
             transactionDao.deleteAll()
             categoryDao.deleteAll()
@@ -340,6 +369,7 @@ class TabunganRepositoryImpl(
 
     override suspend fun clearAllData() {
         database.withTransaction {
+            savingsGoalDao.deleteAll()
             budgetDao.deleteAll()
             transactionDao.deleteAll()
             categoryDao.deleteAll()

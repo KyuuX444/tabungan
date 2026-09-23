@@ -61,7 +61,8 @@ fun NeoButton(
     val actualBg = if (enabled) backgroundColor else backgroundColor.copy(alpha = 0.5f)
 
     Box(
-        modifier = modifier.padding(end = shadowOffset, bottom = shadowOffset)
+        modifier = modifier.padding(end = shadowOffset, bottom = shadowOffset),
+        propagateMinConstraints = true
     ) {
         Box(
             modifier = Modifier
@@ -86,6 +87,7 @@ fun NeoButton(
             contentAlignment = Alignment.Center
         ) {
             Row(
+                modifier = Modifier.wrapContentSize(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {

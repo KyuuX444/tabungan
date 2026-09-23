@@ -2,10 +2,12 @@ package com.kyu.tabungan.ui.transaction
 
 import android.app.DatePickerDialog
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -168,8 +170,13 @@ fun AddEditTransactionScreen(
                 AnimatedContent(
                     targetState = uiState.type,
                     transitionSpec = {
-                        (fadeIn(animationSpec = tween(220)) + slideInVertically(animationSpec = tween(220)) { it / 3 })
-                            .togetherWith(fadeOut(animationSpec = tween(150)))
+                        val isGoingExpense = targetState == TransactionType.EXPENSE
+                        (slideInHorizontally(animationSpec = tween(220, easing = FastOutSlowInEasing)) { width -> if (isGoingExpense) -width / 4 else width / 4 } +
+                            fadeIn(animationSpec = tween(200)))
+                            .togetherWith(
+                                slideOutHorizontally(animationSpec = tween(180, easing = FastOutSlowInEasing)) { width -> if (isGoingExpense) width / 4 else -width / 4 } +
+                                    fadeOut(animationSpec = tween(150))
+                            )
                     },
                     label = "categoryAnim"
                 ) { targetType ->
@@ -342,8 +349,7 @@ fun AddEditTransactionScreen(
             NeoTextField(
                 value = uiState.note,
                 onValueChange = { viewModel.setNote(it) },
-                label = "Catatan (Opsional)",
-                placeholder = "Contoh: Makan siang nasi padang"
+                label = "Catatan (Opsional)"
             )
         }
 

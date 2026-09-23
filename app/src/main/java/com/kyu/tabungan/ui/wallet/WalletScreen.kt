@@ -111,8 +111,7 @@ fun WalletScreen(
                 NeoTextField(
                     value = walletName,
                     onValueChange = { walletName = it },
-                    label = "Nama Dompet",
-                    placeholder = "Contoh: BCA, GoPay, Tunai Dompet"
+                    label = "Nama Dompet"
                 )
 
                 Column {

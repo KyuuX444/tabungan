@@ -8,10 +8,12 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.kyu.tabungan.data.dao.BudgetDao
 import com.kyu.tabungan.data.dao.CategoryDao
+import com.kyu.tabungan.data.dao.SavingsGoalDao
 import com.kyu.tabungan.data.dao.TransactionDao
 import com.kyu.tabungan.data.dao.WalletDao
 import com.kyu.tabungan.data.entity.BudgetEntity
 import com.kyu.tabungan.data.entity.CategoryEntity
+import com.kyu.tabungan.data.entity.SavingsGoalEntity
 import com.kyu.tabungan.data.entity.TransactionEntity
 import com.kyu.tabungan.data.entity.TransactionType
 import com.kyu.tabungan.data.entity.WalletEntity
@@ -25,9 +27,10 @@ import kotlinx.coroutines.launch
         WalletEntity::class,
         CategoryEntity::class,
         TransactionEntity::class,
-        BudgetEntity::class
+        BudgetEntity::class,
+        SavingsGoalEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -36,6 +39,7 @@ abstract class TabunganDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun transactionDao(): TransactionDao
     abstract fun budgetDao(): BudgetDao
+    abstract fun savingsGoalDao(): SavingsGoalDao
 
     companion object {
         @Volatile
@@ -91,6 +95,18 @@ abstract class TabunganDatabase : RoomDatabase() {
             )
 
             database.categoryDao().insertAll(defaultIncomeCategories + defaultExpenseCategories)
+
+            val defaultGoals = listOf(
+                SavingsGoalEntity(
+                    name = "Beli HP Impian",
+                    targetAmount = 10000000L,
+                    savedAmount = 2500000L,
+                    dailyTarget = 50000L,
+                    icon = "phone",
+                    note = "Tabungan harian untuk ganti smartphone baru"
+                )
+            )
+            database.savingsGoalDao().insertAll(defaultGoals)
         }
     }
 }

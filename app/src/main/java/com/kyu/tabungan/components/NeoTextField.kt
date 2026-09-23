@@ -102,17 +102,6 @@ fun NeoTextField(
                 }
 
                 Box(modifier = Modifier.weight(1f)) {
-                    if (value.isEmpty() && placeholder.isNotEmpty()) {
-                        Text(
-                            text = placeholder,
-                            color = TextMuted,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        )
-                    }
-
                     BasicTextField(
                         value = value,
                         onValueChange = onValueChange,

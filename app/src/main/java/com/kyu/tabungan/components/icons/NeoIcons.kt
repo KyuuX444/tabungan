@@ -933,6 +933,157 @@ object NeoIcons {
         }.build()
     }
 
+    val Goal: ImageVector by lazy {
+        vector("Goal") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 2f)
+                curveTo(6.48f, 2f, 2f, 6.48f, 2f, 12f)
+                curveTo(2f, 17.52f, 6.48f, 22f, 12f, 22f)
+                curveTo(17.52f, 22f, 22f, 17.52f, 22f, 12f)
+                close()
+                moveTo(12f, 6f)
+                curveTo(8.69f, 6f, 6f, 8.69f, 6f, 12f)
+                curveTo(6f, 15.31f, 8.69f, 18f, 12f, 18f)
+                curveTo(15.31f, 18f, 18f, 15.31f, 18f, 12f)
+                close()
+                moveTo(12f, 10f)
+                curveTo(10.9f, 10f, 10f, 10.9f, 10f, 12f)
+                curveTo(10f, 13.1f, 10.9f, 14f, 12f, 14f)
+                curveTo(13.1f, 14f, 14f, 13.1f, 14f, 12f)
+                close()
+            }
+        }
+    }
+
+    val Phone: ImageVector by lazy {
+        vector("Phone") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(7f, 2f)
+                horizontalLineTo(17f)
+                curveTo(18.1f, 2f, 19f, 2.9f, 19f, 4f)
+                verticalLineTo(20f)
+                curveTo(19f, 21.1f, 18.1f, 22f, 17f, 22f)
+                horizontalLineTo(7f)
+                curveTo(5.9f, 22f, 5f, 21.1f, 5f, 20f)
+                verticalLineTo(4f)
+                curveTo(5f, 2.9f, 5.9f, 2f, 7f, 2f)
+                close()
+                moveTo(12f, 18f)
+                horizontalLineTo(12.01f)
+            }
+        }
+    }
+
+    val Laptop: ImageVector by lazy {
+        vector("Laptop") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(4f, 6f)
+                horizontalLineTo(20f)
+                verticalLineTo(15f)
+                horizontalLineTo(4f)
+                close()
+                moveTo(2f, 18f)
+                horizontalLineTo(22f)
+            }
+        }
+    }
+
+    val Vehicle: ImageVector by lazy {
+        vector("Vehicle") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(5f, 17f)
+                horizontalLineTo(19f)
+                moveTo(5f, 17f)
+                lineTo(3f, 11f)
+                lineTo(5f, 5f)
+                horizontalLineTo(19f)
+                lineTo(21f, 11f)
+                lineTo(19f, 17f)
+            }
+        }
+    }
+
+    val House: ImageVector by lazy {
+        vector("House") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(3f, 10f)
+                lineTo(12f, 3f)
+                lineTo(21f, 10f)
+                verticalLineTo(20f)
+                horizontalLineTo(4f)
+                close()
+            }
+        }
+    }
+
+    val Camera: ImageVector by lazy {
+        vector("Camera") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(4f, 7f)
+                horizontalLineTo(7f)
+                lineTo(9f, 4f)
+                horizontalLineTo(15f)
+                lineTo(17f, 7f)
+                horizontalLineTo(20f)
+                curveTo(21.1f, 7f, 22f, 7.9f, 22f, 9f)
+                verticalLineTo(19f)
+                curveTo(22f, 20.1f, 21.1f, 21f, 20f, 21f)
+                horizontalLineTo(4f)
+                curveTo(2.9f, 21f, 2f, 20.1f, 2f, 19f)
+                verticalLineTo(9f)
+                close()
+                moveTo(12f, 10f)
+                curveTo(10.34f, 10f, 9f, 11.34f, 9f, 13f)
+                curveTo(9f, 14.66f, 10.34f, 16f, 12f, 16f)
+                curveTo(13.66f, 16f, 15f, 14.66f, 15f, 13f)
+                close()
+            }
+        }
+    }
+
+    fun getGoalIcon(iconName: String): ImageVector {
+        return when (iconName.lowercase()) {
+            "phone", "hp" -> Phone
+            "laptop", "komputer" -> Laptop
+            "motor", "car", "kendaraan", "vehicle" -> Vehicle
+            "house", "rumah" -> House
+            "camera", "foto" -> Camera
+            "trip", "liburan" -> Transport
+            "gold", "emas", "investasi" -> Budget
+            else -> Goal
+        }
+    }
+
     fun getCategoryIcon(iconName: String): ImageVector {
         return when (iconName.lowercase()) {
             "food", "makanan" -> Food

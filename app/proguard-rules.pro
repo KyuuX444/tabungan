@@ -19,3 +19,6 @@
 }
 -keep class com.google.gson.** { *; }
 -dontwarn com.google.gson.**
+
+-keep class coil.** { *; }
+-dontwarn coil.**
