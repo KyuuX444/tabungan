@@ -1,6 +1,9 @@
 package com.kyu.tabungan.ui.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -19,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -41,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.kyu.tabungan.components.NeoButton
 import com.kyu.tabungan.components.NeoCard
 import com.kyu.tabungan.components.NeoDialog
@@ -51,6 +57,7 @@ import com.kyu.tabungan.theme.BorderColor
 import com.kyu.tabungan.theme.BrightBlue
 import com.kyu.tabungan.theme.LightBlue
 import com.kyu.tabungan.theme.StatusDanger
+import com.kyu.tabungan.theme.StatusSuccess
 import com.kyu.tabungan.theme.Surface
 import com.kyu.tabungan.theme.TextMain
 import com.kyu.tabungan.theme.TextMuted
@@ -73,6 +80,20 @@ fun SettingsScreen(
 
     var pendingExportJson by remember { mutableStateOf<String?>(null) }
     var showClearDataDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadReminderSettings(context)
+    }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.setReminderEnabled(context, true)
+        } else {
+            viewModel.setReminderEnabled(context, false)
+        }
+    }
 
     val createDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -199,6 +220,167 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Black,
                         color = TextMain
                     )
+                }
+            }
+
+            item {
+                SectionHeader("Notifikasi & Pengingat")
+            }
+
+            item {
+                NeoCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shadowOffset = 4.dp,
+                    cornerRadius = 14.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(if (uiState.isReminderEnabled) LightBlue else Background)
+                                        .border(width = 1.5.dp, color = BorderColor, shape = RoundedCornerShape(10.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = NeoIcons.Bell,
+                                        contentDescription = null,
+                                        tint = if (uiState.isReminderEnabled) BrightBlue else TextMuted,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Pengingat Nabung Harian",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextMain
+                                    )
+                                    Text(
+                                        text = if (uiState.isReminderEnabled) {
+                                            "Aktif pukul ${String.format("%02d:%02d", uiState.reminderHour, uiState.reminderMinute)} WIB"
+                                        } else {
+                                            "Pengingat harian nonaktif"
+                                        },
+                                        fontSize = 12.sp,
+                                        color = TextMuted
+                                    )
+                                }
+                            }
+
+                            NeoButton(
+                                text = if (uiState.isReminderEnabled) "AKTIF" else "NONAKTIF",
+                                onClick = {
+                                    if (!uiState.isReminderEnabled) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                        } else {
+                                            viewModel.setReminderEnabled(context, true)
+                                        }
+                                    } else {
+                                        viewModel.setReminderEnabled(context, false)
+                                    }
+                                },
+                                backgroundColor = if (uiState.isReminderEnabled) StatusSuccess else Color(0xFFE2E8F0),
+                                textColor = if (uiState.isReminderEnabled) Surface else TextMuted,
+                                shadowOffset = 2.dp,
+                                borderWidth = 1.5.dp,
+                                cornerRadius = 8.dp
+                            )
+                        }
+
+                        if (uiState.isReminderEnabled) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(BorderColor.copy(alpha = 0.2f))
+                            )
+
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(
+                                    text = "Pilih Waktu Pengingat:",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextMain
+                                )
+
+                                val timePresets = listOf(
+                                    Pair(9, 0) to "09:00 Pagi",
+                                    Pair(13, 0) to "13:00 Siang",
+                                    Pair(18, 0) to "18:00 Sore",
+                                    Pair(20, 0) to "20:00 Malam",
+                                    Pair(21, 0) to "21:00 Malam"
+                                )
+
+                                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    items(timePresets) { (time, label) ->
+                                        val isSelected = uiState.reminderHour == time.first && uiState.reminderMinute == time.second
+                                        val chipShape = RoundedCornerShape(8.dp)
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(chipShape)
+                                                .background(if (isSelected) BrightBlue else Surface)
+                                                .border(
+                                                    width = if (isSelected) 2.dp else 1.5.dp,
+                                                    color = BorderColor,
+                                                    shape = chipShape
+                                                )
+                                                .clickable { viewModel.setReminderTime(context, time.first, time.second) }
+                                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = label,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isSelected) Surface else TextMain
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                NeoButton(
+                                    text = "🔔 Uji Notifikasi",
+                                    onClick = {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                        } else {
+                                            viewModel.testNotification(context)
+                                        }
+                                    },
+                                    backgroundColor = LightBlue,
+                                    textColor = BrightBlue,
+                                    shadowOffset = 2.dp,
+                                    borderWidth = 1.5.dp,
+                                    cornerRadius = 8.dp
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -337,7 +519,7 @@ fun SettingsScreen(
                                 color = TextMain
                             )
                             Text(
-                                text = "1.0.2",
+                                text = "1.0.4",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextMuted

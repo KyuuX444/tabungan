@@ -1,11 +1,13 @@
 package com.kyu.tabungan.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kyu.tabungan.data.backup.BackupData
 import com.kyu.tabungan.data.backup.BackupManager
 import com.kyu.tabungan.data.backup.BackupSummary
 import com.kyu.tabungan.data.repository.TabunganRepository
+import com.kyu.tabungan.notification.SavingsReminderManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,7 +26,10 @@ data class SettingsUiState(
     val pendingImportData: BackupData? = null,
     val pendingImportSummary: BackupSummary? = null,
     val isImportDialogVisible: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isReminderEnabled: Boolean = true,
+    val reminderHour: Int = 20,
+    val reminderMinute: Int = 0
 )
 
 class SettingsViewModel(
@@ -38,6 +43,47 @@ class SettingsViewModel(
 
     private val _eventFlow = MutableSharedFlow<SettingsEvent>()
     val eventFlow: SharedFlow<SettingsEvent> = _eventFlow.asSharedFlow()
+
+    fun loadReminderSettings(context: Context) {
+        val enabled = SavingsReminderManager.isReminderEnabled(context)
+        val hour = SavingsReminderManager.getReminderHour(context)
+        val minute = SavingsReminderManager.getReminderMinute(context)
+        _uiState.update {
+            it.copy(
+                isReminderEnabled = enabled,
+                reminderHour = hour,
+                reminderMinute = minute
+            )
+        }
+    }
+
+    fun setReminderEnabled(context: Context, enabled: Boolean) {
+        SavingsReminderManager.setReminderEnabled(context, enabled)
+        _uiState.update { it.copy(isReminderEnabled = enabled) }
+        viewModelScope.launch {
+            _eventFlow.emit(
+                SettingsEvent.ShowMessage(
+                    if (enabled) "Pengingat nabung harian diaktifkan" else "Pengingat nabung dinonaktifkan"
+                )
+            )
+        }
+    }
+
+    fun setReminderTime(context: Context, hour: Int, minute: Int) {
+        SavingsReminderManager.setReminderTime(context, hour, minute)
+        _uiState.update { it.copy(reminderHour = hour, reminderMinute = minute) }
+        val timeString = String.format("%02d:%02d", hour, minute)
+        viewModelScope.launch {
+            _eventFlow.emit(SettingsEvent.ShowMessage("Waktu pengingat diatur ke pukul $timeString WIB"))
+        }
+    }
+
+    fun testNotification(context: Context) {
+        SavingsReminderManager.sendTestNotification(context)
+        viewModelScope.launch {
+            _eventFlow.emit(SettingsEvent.ShowMessage("Notifikasi pengingat nabung dikirim!"))
+        }
+    }
 
     fun exportData() {
         viewModelScope.launch {

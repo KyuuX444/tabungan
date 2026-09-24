@@ -1069,6 +1069,30 @@ object NeoIcons {
                 close()
             }
         }
+    val Bell: ImageVector by lazy {
+        vector("Bell") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(18f, 8f)
+                curveTo(18f, 6.4f, 17.36f, 4.88f, 16.24f, 3.76f)
+                curveTo(15.12f, 2.64f, 13.6f, 2f, 12f, 2f)
+                curveTo(10.4f, 2f, 8.88f, 2.64f, 7.76f, 3.76f)
+                curveTo(6.64f, 4.88f, 6f, 6.4f, 6f, 8f)
+                curveTo(6f, 15f, 3f, 17f, 3f, 17f)
+                horizontalLineTo(21f)
+                curveTo(21f, 17f, 18f, 15f, 18f, 8f)
+                close()
+                moveTo(13.73f, 21f)
+                curveTo(13.55f, 21.3f, 13.3f, 21.55f, 13f, 21.73f)
+                curveTo(12.7f, 21.9f, 12.35f, 22f, 12f, 22f)
+                curveTo(11.65f, 22f, 11.3f, 21.9f, 11f, 21.73f)
+                curveTo(10.7f, 21.55f, 10.45f, 21.3f, 10.27f, 21f)
+            }
+        }
     }
 
     fun getGoalIcon(iconName: String): ImageVector {

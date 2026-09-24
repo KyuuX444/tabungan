@@ -121,8 +121,8 @@ fun MoreScreen(
 
         item {
             MoreMenuCard(
-                title = "Pengaturan & Cadangan",
-                subtitle = "Ekspor data, impor data cadangan, dan info aplikasi",
+                title = "Pengaturan & Notifikasi",
+                subtitle = "Pengingat nabung harian, cadangan data, dan sistem",
                 icon = NeoIcons.Settings,
                 onClick = onNavigateToSettings
             )

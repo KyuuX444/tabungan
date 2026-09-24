@@ -4,6 +4,7 @@ import android.app.Application
 import com.kyu.tabungan.data.database.TabunganDatabase
 import com.kyu.tabungan.data.repository.TabunganRepository
 import com.kyu.tabungan.data.repository.TabunganRepositoryImpl
+import com.kyu.tabungan.notification.SavingsReminderManager
 
 class TabunganApp : Application() {
     lateinit var repository: TabunganRepository
@@ -16,5 +17,9 @@ class TabunganApp : Application() {
         super.onCreate()
         database = TabunganDatabase.getInstance(this)
         repository = TabunganRepositoryImpl(this, database)
+        SavingsReminderManager.createNotificationChannel(this)
+        if (SavingsReminderManager.isReminderEnabled(this)) {
+            SavingsReminderManager.scheduleReminder(this)
+        }
     }
 }
