@@ -1069,6 +1069,8 @@ object NeoIcons {
                 close()
             }
         }
+    }
+
     val Bell: ImageVector by lazy {
         vector("Bell") {
             path(
