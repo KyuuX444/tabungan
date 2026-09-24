@@ -10,5 +10,6 @@
 *.apk
 *.aab
 *.keystore
+!keystore/release.keystore
 *.jks
 .env
