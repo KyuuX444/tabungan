@@ -299,7 +299,7 @@ fun SettingsScreen(
                                     }
                                 },
                                 backgroundColor = if (uiState.isReminderEnabled) StatusSuccess else Color(0xFFE2E8F0),
-                                textColor = if (uiState.isReminderEnabled) Surface else TextMuted,
+                                contentColor = if (uiState.isReminderEnabled) Surface else TextMuted,
                                 shadowOffset = 2.dp,
                                 borderWidth = 1.5.dp,
                                 cornerRadius = 8.dp
@@ -373,7 +373,7 @@ fun SettingsScreen(
                                         }
                                     },
                                     backgroundColor = LightBlue,
-                                    textColor = BrightBlue,
+                                    contentColor = BrightBlue,
                                     shadowOffset = 2.dp,
                                     borderWidth = 1.5.dp,
                                     cornerRadius = 8.dp
