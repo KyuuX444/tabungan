@@ -95,18 +95,6 @@ abstract class TabunganDatabase : RoomDatabase() {
             )
 
             database.categoryDao().insertAll(defaultIncomeCategories + defaultExpenseCategories)
-
-            val defaultGoals = listOf(
-                SavingsGoalEntity(
-                    name = "Beli HP Impian",
-                    targetAmount = 10000000L,
-                    savedAmount = 2500000L,
-                    dailyTarget = 50000L,
-                    icon = "phone",
-                    note = "Tabungan harian untuk ganti smartphone baru"
-                )
-            )
-            database.savingsGoalDao().insertAll(defaultGoals)
         }
     }
 }

@@ -318,6 +318,9 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+
         if (uiState.activeGoal != null) {
             item {
                 val goal = uiState.activeGoal!!
