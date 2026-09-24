@@ -49,6 +49,10 @@ class HomeViewModel(
     val budgetsWithUsage = repository.getBudgetsWithUsage(currentMonth, currentYear, monthRange.first, monthRange.second)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val budgetInfo = combine(totalBudgetLimit, budgetsWithUsage) { limit, budgets ->
+        Pair(limit, budgets.sumOf { it.spentAmount })
+    }
+
     val allGoals = repository.getAllSavingsGoals()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -56,11 +60,10 @@ class HomeViewModel(
         totalBalance,
         financialSummary,
         recentTransactions,
-        totalBudgetLimit,
-        budgetsWithUsage,
+        budgetInfo,
         allGoals
-    ) { balance, summary, recent, budgetLimit, budgets, goals ->
-        val spentOnBudgets = budgets.sumOf { it.spentAmount }
+    ) { balance, summary, recent, budgetData, goals ->
+        val (budgetLimit, spentOnBudgets) = budgetData
         val active = goals.firstOrNull { !it.isAchieved } ?: goals.firstOrNull()
         HomeUiState(
             totalBalance = balance,

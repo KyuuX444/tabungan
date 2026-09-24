@@ -314,12 +314,53 @@ fun SettingsScreen(
                                     .background(BorderColor.copy(alpha = 0.2f))
                             )
 
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Waktu Pengingat",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextMain
+                                        )
+                                        Text(
+                                            text = "Pukul ${String.format("%02d:%02d", uiState.reminderHour, uiState.reminderMinute)} WIB",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = BrightBlue
+                                        )
+                                    }
+
+                                    NeoButton(
+                                        text = "⏰ Set Jam",
+                                        onClick = {
+                                            android.app.TimePickerDialog(
+                                                context,
+                                                { _, selectedHour, selectedMinute ->
+                                                    viewModel.setReminderTime(context, selectedHour, selectedMinute)
+                                                },
+                                                uiState.reminderHour,
+                                                uiState.reminderMinute,
+                                                true
+                                            ).show()
+                                        },
+                                        backgroundColor = Surface,
+                                        contentColor = TextMain,
+                                        shadowOffset = 2.dp,
+                                        borderWidth = 1.5.dp,
+                                        cornerRadius = 8.dp
+                                    )
+                                }
+
                                 Text(
-                                    text = "Pilih Waktu Pengingat:",
-                                    fontSize = 12.sp,
+                                    text = "Pilihan Jam Cepat:",
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = TextMain
+                                    color = TextMuted
                                 )
 
                                 val timePresets = listOf(
