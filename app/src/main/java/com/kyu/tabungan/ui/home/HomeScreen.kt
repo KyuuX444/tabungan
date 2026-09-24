@@ -61,6 +61,7 @@ fun HomeScreen(
     onNavigateToTransactionDetail: (Long) -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToBudgets: () -> Unit,
+    onNavigateToGoals: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -310,6 +311,102 @@ fun HomeScreen(
                             } else 0
                             Text(
                                 text = "$percent%",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextMuted
+                            )
+                        }
+                    }
+                }
+        if (uiState.activeGoal != null) {
+            item {
+                val goal = uiState.activeGoal!!
+                val progress = if (goal.targetAmount > 0L) {
+                    (goal.savedAmount.toFloat() / goal.targetAmount.toFloat()).coerceIn(0f, 1f)
+                } else 0f
+                val percent = (progress * 100).toInt()
+                val remaining = (goal.targetAmount - goal.savedAmount).coerceAtLeast(0L)
+
+                NeoCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    backgroundColor = Surface,
+                    shadowOffset = 5.dp,
+                    cornerRadius = 14.dp,
+                    onClick = onNavigateToGoals
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(LightBlue)
+                                        .border(width = 1.5.dp, color = BorderColor, shape = RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = NeoIcons.getGoalIcon(goal.icon),
+                                        contentDescription = null,
+                                        tint = BrightBlue,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Target Tabungan",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextMuted
+                                    )
+                                    Text(
+                                        text = goal.name,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = TextMain
+                                    )
+                                }
+                            }
+
+                            Text(
+                                text = if (goal.isAchieved) "Tercapai!" else "$percent%",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (goal.isAchieved) StatusSuccess else BrightBlue
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        NeoProgressBar(
+                            progress = progress,
+                            isOverBudget = false,
+                            height = 12.dp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "${CurrencyFormatter.formatRupiah(goal.savedAmount)} / ${CurrencyFormatter.formatRupiah(goal.targetAmount)}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextMain
+                            )
+                            Text(
+                                text = if (goal.isAchieved) "Selesai" else "Sisa: ${CurrencyFormatter.formatRupiah(remaining)}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextMuted

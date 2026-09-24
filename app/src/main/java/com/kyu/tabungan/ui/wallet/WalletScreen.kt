@@ -149,18 +149,20 @@ fun WalletScreen(
                                 )
                                 Box(
                                     modifier = Modifier
+                                        .fillMaxWidth()
                                         .clip(tShape)
                                         .background(if (isSelected) BrightBlue else Surface)
                                         .border(width = 1.5.dp, color = BorderColor, shape = tShape)
                                         .clickable { walletType = type }
-                                        .padding(vertical = 8.dp),
+                                        .padding(vertical = 8.dp, horizontal = 2.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = typeLabel,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) Surface else TextMain
+                                        color = if (isSelected) Surface else TextMain,
+                                        maxLines = 1
                                     )
                                 }
                             }

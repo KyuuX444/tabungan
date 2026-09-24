@@ -20,6 +20,7 @@ data class HomeUiState(
     val monthlyExpense: Long = 0L,
     val monthlyBudgetLimit: Long = 0L,
     val monthlyBudgetSpent: Long = 0L,
+    val activeGoal: com.kyu.tabungan.data.entity.SavingsGoalEntity? = null,
     val recentTransactions: List<TransactionItemModel> = emptyList(),
     val isLoading: Boolean = false
 )
@@ -48,20 +49,26 @@ class HomeViewModel(
     val budgetsWithUsage = repository.getBudgetsWithUsage(currentMonth, currentYear, monthRange.first, monthRange.second)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val allGoals = repository.getAllSavingsGoals()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val uiState: StateFlow<HomeUiState> = combine(
         totalBalance,
         financialSummary,
         recentTransactions,
         totalBudgetLimit,
-        budgetsWithUsage
-    ) { balance, summary, recent, budgetLimit, budgets ->
+        budgetsWithUsage,
+        allGoals
+    ) { balance, summary, recent, budgetLimit, budgets, goals ->
         val spentOnBudgets = budgets.sumOf { it.spentAmount }
+        val active = goals.firstOrNull { !it.isAchieved } ?: goals.firstOrNull()
         HomeUiState(
             totalBalance = balance,
             monthlyIncome = summary.totalIncome,
             monthlyExpense = summary.totalExpense,
             monthlyBudgetLimit = budgetLimit,
             monthlyBudgetSpent = spentOnBudgets,
+            activeGoal = active,
             recentTransactions = recent,
             isLoading = false
         )

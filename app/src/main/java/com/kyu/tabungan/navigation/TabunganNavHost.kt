@@ -93,7 +93,8 @@ fun TabunganNavHost(
                 onNavigateToAddTransaction = { navController.navigate(Screen.AddTransaction.createRoute()) },
                 onNavigateToTransactionDetail = { id -> navController.navigate(Screen.TransactionDetail.createRoute(id)) },
                 onNavigateToSearch = { navController.navigate(Screen.Search.route) },
-                onNavigateToBudgets = { navController.navigate(Screen.Budgets.route) }
+                onNavigateToBudgets = { navController.navigate(Screen.Budgets.route) },
+                onNavigateToGoals = { navController.navigate(Screen.SavingsGoals.route) }
             )
         }
 

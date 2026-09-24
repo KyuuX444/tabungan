@@ -72,12 +72,13 @@ object TabunganWidgetUpdater {
                 for (appWidgetId in smallIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_small)
 
-                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 100, "tabungan://home"))
-                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 101, "tabungan://savings-goals"))
-                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 102, "tabungan://wallet"))
-                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 103, "tabungan://add-income"))
-                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 104, "tabungan://add-expense"))
-                    views.setOnClickPendingIntent(R.id.widget_tv_subinfo, createNavPendingIntent(context, 105, "tabungan://wallet"))
+                    views.setOnClickPendingIntent(R.id.widget_root, createNavPendingIntent(context, 100, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 101, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 102, "tabungan://savings-goals"))
+                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 103, "tabungan://wallet"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 104, "tabungan://add-income"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 105, "tabungan://add-expense"))
+                    views.setOnClickPendingIntent(R.id.widget_tv_subinfo, createNavPendingIntent(context, 106, "tabungan://wallet"))
 
                     views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))
 
@@ -100,15 +101,16 @@ object TabunganWidgetUpdater {
                 for (appWidgetId in largeIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_large)
 
-                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 200, "tabungan://home"))
-                    views.setOnClickPendingIntent(R.id.widget_chip_month, createNavPendingIntent(context, 201, "tabungan://statistics"))
-                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 202, "tabungan://savings-goals"))
-                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 203, "tabungan://wallet"))
-                    views.setOnClickPendingIntent(R.id.widget_card_income_box, createNavPendingIntent(context, 204, "tabungan://statistics"))
-                    views.setOnClickPendingIntent(R.id.widget_card_expense_box, createNavPendingIntent(context, 205, "tabungan://statistics"))
-                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 206, "tabungan://add-income"))
-                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 207, "tabungan://add-expense"))
-                    views.setOnClickPendingIntent(R.id.widget_btn_goal, createNavPendingIntent(context, 208, "tabungan://savings-goals"))
+                    views.setOnClickPendingIntent(R.id.widget_root, createNavPendingIntent(context, 200, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 201, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_month, createNavPendingIntent(context, 202, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 203, "tabungan://savings-goals"))
+                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 204, "tabungan://wallet"))
+                    views.setOnClickPendingIntent(R.id.widget_card_income_box, createNavPendingIntent(context, 205, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_card_expense_box, createNavPendingIntent(context, 206, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 207, "tabungan://add-income"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 208, "tabungan://add-expense"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_goal, createNavPendingIntent(context, 209, "tabungan://savings-goals"))
 
                     views.setTextViewText(R.id.widget_chip_month, monthLabel)
                     views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))

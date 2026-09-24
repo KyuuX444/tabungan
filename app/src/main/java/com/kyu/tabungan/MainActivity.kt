@@ -42,9 +42,9 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val currentUri by deepLinkUri
-                LaunchedEffect(currentUri, navBackStackEntry) {
+                LaunchedEffect(currentUri) {
                     val uri = currentUri ?: return@LaunchedEffect
-                    if (navBackStackEntry == null) return@LaunchedEffect
+                    deepLinkUri.value = null
 
                     val target = uri.host?.takeIf { it.isNotBlank() }
                         ?: uri.path?.removePrefix("/")?.takeIf { it.isNotBlank() }
@@ -63,27 +63,29 @@ class MainActivity : ComponentActivity() {
                         }
                         "statistics", "stats" -> {
                             navController.navigate(Screen.Statistics.route) {
+                                popUpTo(Screen.Home.route) { saveState = true }
                                 launchSingleTop = true
+                                restoreState = true
                             }
                         }
                         "wallet", "wallets" -> {
                             navController.navigate(Screen.Wallets.route) {
+                                popUpTo(Screen.Home.route) { saveState = true }
                                 launchSingleTop = true
+                                restoreState = true
                             }
                         }
-                        "savings-goals", "goals" -> {
+                        "savings-goals", "goals", "tabungan" -> {
                             navController.navigate(Screen.SavingsGoals.route) {
                                 launchSingleTop = true
                             }
                         }
                         "home" -> {
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(Screen.Home.route) { inclusive = true }
-                                launchSingleTop = true
+                            if (navController.currentDestination?.route != Screen.Home.route) {
+                                navController.popBackStack(Screen.Home.route, false)
                             }
                         }
                     }
-                    deepLinkUri.value = null
                 }
 
                 val isTopLevelDestination = currentRoute in listOf(
