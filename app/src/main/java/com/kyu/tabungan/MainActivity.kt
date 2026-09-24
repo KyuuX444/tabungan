@@ -5,9 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +32,8 @@ class MainActivity : ComponentActivity() {
         val app = application as TabunganApp
         val repository = app.repository
 
-        deepLinkUri.value = intent?.data
+        val initialUri = intent?.data ?: intent?.getStringExtra("route")?.let { Uri.parse(it) }
+        deepLinkUri.value = initialUri
 
         setContent {
             TabunganTheme {
@@ -44,20 +42,45 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val currentUri by deepLinkUri
-                LaunchedEffect(currentUri) {
+                LaunchedEffect(currentUri, navBackStackEntry) {
                     val uri = currentUri ?: return@LaunchedEffect
-                    when {
-                        uri.scheme == "tabungan" && uri.host == "add-expense" -> {
-                            navController.navigate(Screen.AddTransaction.createRoute(type = TransactionType.EXPENSE))
+                    if (navBackStackEntry == null) return@LaunchedEffect
+
+                    val target = uri.host?.takeIf { it.isNotBlank() }
+                        ?: uri.path?.removePrefix("/")?.takeIf { it.isNotBlank() }
+                        ?: uri.toString().substringAfter("://").substringBefore("/")
+
+                    when (target) {
+                        "add-expense", "expense" -> {
+                            navController.navigate(Screen.AddTransaction.createRoute(type = TransactionType.EXPENSE)) {
+                                launchSingleTop = true
+                            }
                         }
-                        uri.scheme == "tabungan" && uri.host == "add-income" -> {
-                            navController.navigate(Screen.AddTransaction.createRoute(type = TransactionType.INCOME))
+                        "add-income", "income" -> {
+                            navController.navigate(Screen.AddTransaction.createRoute(type = TransactionType.INCOME)) {
+                                launchSingleTop = true
+                            }
                         }
-                        uri.scheme == "tabungan" && uri.host == "statistics" -> {
-                            navController.navigate(Screen.Statistics.route)
+                        "statistics", "stats" -> {
+                            navController.navigate(Screen.Statistics.route) {
+                                launchSingleTop = true
+                            }
                         }
-                        uri.scheme == "tabungan" && uri.host == "wallet" -> {
-                            navController.navigate(Screen.Wallets.route)
+                        "wallet", "wallets" -> {
+                            navController.navigate(Screen.Wallets.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                        "savings-goals", "goals" -> {
+                            navController.navigate(Screen.SavingsGoals.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                        "home" -> {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     }
                     deepLinkUri.value = null
@@ -106,6 +129,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        deepLinkUri.value = intent.data
+        val uri = intent.data ?: intent.getStringExtra("route")?.let { Uri.parse(it) }
+        deepLinkUri.value = uri
     }
 }

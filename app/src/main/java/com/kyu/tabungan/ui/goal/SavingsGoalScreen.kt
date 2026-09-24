@@ -3,6 +3,8 @@ package com.kyu.tabungan.ui.goal
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import java.io.File
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -99,11 +101,23 @@ fun SavingsGoalScreen(
         var selectedIcon by remember { mutableStateOf(editingGoal?.icon ?: "phone") }
         var note by remember { mutableStateOf(editingGoal?.note.orEmpty()) }
 
+        val context = LocalContext.current
         val imagePickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             if (uri != null) {
-                imageUriString = uri.toString()
+                try {
+                    val goalsDir = File(context.filesDir, "goals").apply { mkdirs() }
+                    val destFile = File(goalsDir, "goal_${System.currentTimeMillis()}.jpg")
+                    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                        destFile.outputStream().use { outputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                    }
+                    imageUriString = Uri.fromFile(destFile).toString()
+                } catch (e: Exception) {
+                    imageUriString = uri.toString()
+                }
             }
         }
 

@@ -254,7 +254,7 @@ fun AboutDevScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Tabungan v1.0.2",
+                        text = "Tabungan v1.0.3",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Black,
                         color = TextMain

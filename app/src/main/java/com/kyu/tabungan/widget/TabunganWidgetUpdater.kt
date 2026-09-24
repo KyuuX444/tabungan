@@ -6,7 +6,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import android.widget.RemoteViews
 import com.kyu.tabungan.MainActivity
 import com.kyu.tabungan.R
@@ -20,6 +19,19 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 object TabunganWidgetUpdater {
+
+    private fun createNavPendingIntent(context: Context, requestCode: Int, uriString: String): PendingIntent {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString), context, MainActivity::class.java).apply {
+            putExtra("route", uriString)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     fun updateAll(context: Context) {
         val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -35,6 +47,7 @@ object TabunganWidgetUpdater {
             val database = TabunganDatabase.getInstance(context)
             val walletDao = database.walletDao()
             val transactionDao = database.transactionDao()
+            val savingsGoalDao = database.savingsGoalDao()
 
             val totalBalance = walletDao.getTotalBalance().first() ?: 0L
 
@@ -45,44 +58,38 @@ object TabunganWidgetUpdater {
 
             val monthlyIncome = transactionDao.getIncomeSumByDateRange(monthRange.first, monthRange.second).first()
             val monthlyExpense = transactionDao.getExpenseSumByDateRange(monthRange.first, monthRange.second).first()
-            val totalTransactions = transactionDao.getAllTransactionsSync().size
 
-            val isDataEmpty = totalTransactions == 0 && totalBalance == 0L
+            val goals = savingsGoalDao.getAllGoals().first()
+            val activeGoal = goals.firstOrNull { !it.isAchieved }
+
+            val monthNames = arrayOf(
+                "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+                "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+            )
+            val monthLabel = "${monthNames.getOrElse(m - 1) { "" }} $y"
 
             if (smallIds.isNotEmpty()) {
                 for (appWidgetId in smallIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_small)
 
-                    val openAppIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val openAppPendingIntent = PendingIntent.getActivity(
-                        context,
-                        101,
-                        openAppIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_content_layout, openAppPendingIntent)
+                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 100, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 101, "tabungan://savings-goals"))
+                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 102, "tabungan://wallet"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 103, "tabungan://add-income"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 104, "tabungan://add-expense"))
+                    views.setOnClickPendingIntent(R.id.widget_tv_subinfo, createNavPendingIntent(context, 105, "tabungan://wallet"))
 
-                    val addExpenseIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tabungan://add-expense"), context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val addExpensePendingIntent = PendingIntent.getActivity(
-                        context,
-                        102,
-                        addExpenseIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_btn_add, addExpensePendingIntent)
+                    views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))
 
-                    if (isDataEmpty) {
-                        views.setViewVisibility(R.id.widget_label_balance, View.GONE)
-                        views.setTextViewText(R.id.widget_tv_balance, "Belum ada data")
-                        views.setViewVisibility(R.id.widget_tv_empty, View.VISIBLE)
+                    if (activeGoal != null) {
+                        val percent = if (activeGoal.targetAmount > 0L) {
+                            ((activeGoal.savedAmount.toDouble() / activeGoal.targetAmount.toDouble()) * 100).toInt().coerceIn(0, 100)
+                        } else 0
+                        views.setTextViewText(R.id.widget_chip_goal, "🎯 $percent%")
+                        views.setTextViewText(R.id.widget_tv_subinfo, "🎯 ${activeGoal.name}: $percent%")
                     } else {
-                        views.setViewVisibility(R.id.widget_label_balance, View.VISIBLE)
-                        views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))
-                        views.setViewVisibility(R.id.widget_tv_empty, View.GONE)
+                        views.setTextViewText(R.id.widget_chip_goal, "🎯 Target")
+                        views.setTextViewText(R.id.widget_tv_subinfo, "Ketuk saldo untuk lihat dompet →")
                     }
 
                     appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -93,51 +100,28 @@ object TabunganWidgetUpdater {
                 for (appWidgetId in largeIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_large)
 
-                    val openAppIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val openAppPendingIntent = PendingIntent.getActivity(
-                        context,
-                        201,
-                        openAppIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_content_layout, openAppPendingIntent)
+                    views.setOnClickPendingIntent(R.id.widget_title_badge, createNavPendingIntent(context, 200, "tabungan://home"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_month, createNavPendingIntent(context, 201, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_chip_goal, createNavPendingIntent(context, 202, "tabungan://savings-goals"))
+                    views.setOnClickPendingIntent(R.id.widget_card_balance, createNavPendingIntent(context, 203, "tabungan://wallet"))
+                    views.setOnClickPendingIntent(R.id.widget_card_income_box, createNavPendingIntent(context, 204, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_card_expense_box, createNavPendingIntent(context, 205, "tabungan://statistics"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_income, createNavPendingIntent(context, 206, "tabungan://add-income"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_expense, createNavPendingIntent(context, 207, "tabungan://add-expense"))
+                    views.setOnClickPendingIntent(R.id.widget_btn_goal, createNavPendingIntent(context, 208, "tabungan://savings-goals"))
 
-                    val addIncomeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tabungan://add-income"), context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val addIncomePendingIntent = PendingIntent.getActivity(
-                        context,
-                        202,
-                        addIncomeIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_btn_income, addIncomePendingIntent)
+                    views.setTextViewText(R.id.widget_chip_month, monthLabel)
+                    views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))
+                    views.setTextViewText(R.id.widget_tv_income, CurrencyFormatter.formatRupiah(monthlyIncome))
+                    views.setTextViewText(R.id.widget_tv_expense, CurrencyFormatter.formatRupiah(monthlyExpense))
 
-                    val addExpenseIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tabungan://add-expense"), context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val addExpensePendingIntent = PendingIntent.getActivity(
-                        context,
-                        203,
-                        addExpenseIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_btn_expense, addExpensePendingIntent)
-
-                    if (isDataEmpty) {
-                        views.setViewVisibility(R.id.widget_label_balance, View.GONE)
-                        views.setTextViewText(R.id.widget_tv_balance, "Belum ada data")
-                        views.setViewVisibility(R.id.widget_tv_empty, View.VISIBLE)
-                        views.setViewVisibility(R.id.widget_stats_container, View.GONE)
+                    if (activeGoal != null) {
+                        val percent = if (activeGoal.targetAmount > 0L) {
+                            ((activeGoal.savedAmount.toDouble() / activeGoal.targetAmount.toDouble()) * 100).toInt().coerceIn(0, 100)
+                        } else 0
+                        views.setTextViewText(R.id.widget_chip_goal, "🎯 ${activeGoal.name} ($percent%)")
                     } else {
-                        views.setViewVisibility(R.id.widget_label_balance, View.VISIBLE)
-                        views.setTextViewText(R.id.widget_tv_balance, CurrencyFormatter.formatRupiah(totalBalance))
-                        views.setViewVisibility(R.id.widget_tv_empty, View.GONE)
-                        views.setViewVisibility(R.id.widget_stats_container, View.VISIBLE)
-                        views.setTextViewText(R.id.widget_tv_income, CurrencyFormatter.formatRupiah(monthlyIncome))
-                        views.setTextViewText(R.id.widget_tv_expense, CurrencyFormatter.formatRupiah(monthlyExpense))
+                        views.setTextViewText(R.id.widget_chip_goal, "🎯 + Target Impian")
                     }
 
                     appWidgetManager.updateAppWidget(appWidgetId, views)
