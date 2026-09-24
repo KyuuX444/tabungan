@@ -577,7 +577,7 @@ private fun GoalCardItem(
                         size = 36.dp
                     )
                     NeoIconButton(
-                        icon = NeoIcons.Delete,
+                        icon = NeoIcons.Trash,
                         onClick = onDelete,
                         contentDescription = "Hapus",
                         size = 36.dp

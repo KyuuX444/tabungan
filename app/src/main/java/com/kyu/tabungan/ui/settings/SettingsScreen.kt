@@ -337,7 +337,7 @@ fun SettingsScreen(
                                 color = TextMain
                             )
                             Text(
-                                text = "1.0.1",
+                                text = "1.0.2",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextMuted

@@ -219,6 +219,18 @@ fun AboutDevScreen(
 
         item {
             DevLinkCard(
+                title = "Website API",
+                subtitle = "Layanan API dan integrasi web resmi api.kyzzz.xyz",
+                actionLabel = "Buka Website",
+                badgeText = "API",
+                badgeBgColor = Color(0xFFF3E8FF),
+                badgeTextColor = Color(0xFF7E22CE),
+                onClick = { openUrl("https://api.kyzzz.xyz") }
+            )
+        }
+
+        item {
+            DevLinkCard(
                 title = "Repositori Tabungan",
                 subtitle = "Kode sumber, kontribusi, dan issue pelaporan bug",
                 actionLabel = "Buka Repositori",
@@ -242,7 +254,7 @@ fun AboutDevScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Tabungan v1.0.1",
+                        text = "Tabungan v1.0.2",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Black,
                         color = TextMain

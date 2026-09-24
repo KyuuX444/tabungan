@@ -187,18 +187,9 @@ fun TabunganNavHost(
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        val initialType = savedStateHandle.get<String>("type")?.let {
-                            try {
-                                TransactionType.valueOf(it)
-                            } catch (e: Exception) {
-                                null
-                            }
-                        }
-                        val initialId = savedStateHandle.get<String>("transactionId")?.toLongOrNull()
                         return AddEditTransactionViewModel(
                             repository = repository,
-                            initialTransactionId = initialId,
-                            initialType = initialType
+                            savedStateHandle = savedStateHandle
                         ) as T
                     }
                 }
@@ -215,12 +206,12 @@ fun TabunganNavHost(
                 navArgument("transactionId") { type = NavType.LongType }
             )
         ) { backStackEntry ->
-            val transactionId = backStackEntry.arguments?.getLong("transactionId") ?: 0L
+            val savedStateHandle = backStackEntry.savedStateHandle
             val vm = viewModel<TransactionDetailViewModel>(
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return TransactionDetailViewModel(repository, transactionId) as T
+                        return TransactionDetailViewModel(repository, savedStateHandle) as T
                     }
                 }
             )

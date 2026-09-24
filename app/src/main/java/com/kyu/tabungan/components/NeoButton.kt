@@ -87,7 +87,6 @@ fun NeoButton(
             contentAlignment = Alignment.Center
         ) {
             Row(
-                modifier = Modifier.wrapContentSize(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
